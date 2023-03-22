@@ -56,9 +56,10 @@ rule multiqc:
         expand(
             os.path.join(
                 OUTPUT_FOLDER,
-                "qc",
-                "fastqc",
-                "trimmed",
+                "databases",
+                "reads_trimmed",
+                "report",
+                "json",
                 "{sample}.json",
             ), 
             sample=FASTQ_SAMPLE,
@@ -235,26 +236,33 @@ rule multiqc_trimmed:
         expand(
             os.path.join(
                 OUTPUT_FOLDER,
-                "qc",
-                "fastqc",
-                "trimmed",
+                "databases",
+                "reads_trimmed",
+                "report",
+                "json",
                 "{sample}.json",
             ), 
             sample=FASTQ_SAMPLE,
         ),
-        os.path.join(
-            OUTPUT_FOLDER,
-            "processed_files",
-            "samtools",
-            "{sample}",
-            "{sample}_sorted.idxstats",
+        expand(
+            os.path.join(
+                OUTPUT_FOLDER,
+                "processed_files",
+                "samtools",
+                "{sample}",
+                "{sample}_sorted.idxstats",
+            ),
+            sample=FASTQ_SAMPLE,
         ),
-        os.path.join(
-            OUTPUT_FOLDER,
-            "processed_files",
-            "samtools",
-            "{sample}",
-            "{sample}_sorted.flags",
+        expand(
+            os.path.join(
+                OUTPUT_FOLDER,
+                "processed_files",
+                "samtools",
+                "{sample}",
+                "{sample}_sorted.flags",
+            ),
+            sample=FASTQ_SAMPLE,
         )
     output: 
         os.path.join(

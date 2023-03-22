@@ -54,11 +54,11 @@ def get_final_output(outdir, reads=False):
     # Lifestyle annotation
     final_output += (
         os.path.join(
-            outdir,
+            OUTPUT_FOLDER,
             "results",
-            "viral_contigs",
-            "viral_contigs_over_3kb.fna.bacphlip",
-        )
+            "bacphlip_out",
+            "viral_contigs_over_3kb.fna.bacphlip.tsv",
+        ),
     )
 
     # Taxonomy annotation
@@ -91,6 +91,18 @@ def get_final_output(outdir, reads=False):
             "otu",
             "final_vOTUs_representative_contigs.txt",
         ),
+    )
+
+    # mpileup
+    final_output += expand(
+        os.path.join(
+            outdir,
+            "processed_files",
+            "samtools",
+            "{sample}",
+            "{sample}_sorted.pileup",
+        ),
+        sample=FASTQ_SAMPLE,
     )
 
     return final_output

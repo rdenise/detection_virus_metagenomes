@@ -52,24 +52,26 @@ rule predict_viral_lifestyles:
         mv {params.hmmsearch:q} {output.hmmsearch:q}
         """
 
+
 ##########################################################################
 ##########################################################################
 
+
 rule parse_bacphlip:
-    input: 
+    input:
         bacphlip=os.path.join(
             OUTPUT_FOLDER,
             "results",
-            "viral_contigs",
+            "bacphlip_out",
             "viral_contigs_over_3kb.fna.bacphlip",
-        )
-    output: 
+        ),
+    output:
         modify=os.path.join(
             OUTPUT_FOLDER,
             "results",
-            "viral_contigs",
-            "viral_contigs_over_3kb.fna.bacphlip",
-        )
+            "bacphlip_out",
+            "viral_contigs_over_3kb.fna.bacphlip.tsv",
+        ),
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -77,11 +79,11 @@ rule parse_bacphlip:
             "bacphlip",
             "parse_bacphlip.log",
         ),
-    conda: 
+    conda:
         "../envs/biopython.yaml"
-    script: 
+    script:
         "../scripts/parse_bacphlip_results.py"
-        
-##########################################################################
-##########################################################################
 
+
+##########################################################################
+##########################################################################
