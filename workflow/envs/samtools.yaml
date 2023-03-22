@@ -1,0 +1,6 @@
+name: snakemake_samtools
+channels:
+  - conda-forge
+  - rdenise
+dependencies:
+  - samtools = 1.16.1

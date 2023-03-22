@@ -1,0 +1,6 @@
+name: snakemake_checkv
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - checkv = 1.0.1

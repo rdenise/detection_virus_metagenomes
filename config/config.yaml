@@ -1,0 +1,74 @@
+# Path to the metagenomes files
+metagenomes:
+    # path to contigs reads folder
+    reads_folder: "/data/san/data1/users/remi/pipeline_identify_virus/test/"
+    # identifier of the sample name in the reads files (e.g. _R if the file is named sample1_R1.fastq.gz)
+    reads_identifier: "_R"
+    # path to contigs folder if you already done the assembly
+    assemble_contigs: ""
+    # Exention of the contig file (e.g. fasta)
+    contigs_ext: ""
+
+# path to the result folder
+output_folder: results
+
+# Blast option if not given in seeds.tsv
+default_blast_option:
+    # E-value threshold: if you want to use scientific notation put a dot after the first number (e.g. 1.e-10 not 1e-10)
+    e_val: 1.e-10
+    # coverage of the contig (between 0 and 1)
+    coverage: 0.85
+    # percentage of identity of the contig (between 0 and 1)
+    pident: 0.95
+    # Minimum coverage option: ['mean':mean of the 2 lengths (default), 'subject':subject length, 'query':query length, 'shortest':shortest length, 'longest'=longest length]
+    cov_min: query
+    # Minimum percentage of identity: ['mean':mean of the 2 lengths (default), 'subject':subject length, 'query':query length, 'shortest':shortest length, 'longest'=longest length, 'HSP'=HSP length]
+    pid_min: HSP
+    # Min length to accept partial sequences in families
+    length_min: 100
+    # Location of the nt database file in you local computer, if you don't have it a remote search will be perform just let empty if you don't have file
+    nt: "/data/san/data0/databases/blast/nt/nt"
+
+# Location of the IPhop database
+iphop_db: /data/san/data0/databases/iPHoP
+
+# Genomad option
+genomad:
+    # Location of the genomad database
+    path: /data/san/data0/databases/genomad_db
+    # Composition either virome or metagenome
+    composition: metagenome
+
+# Databases option
+databases:
+    # ICTV
+    ICTV:
+        # Path to ICTV all genome file
+        path: "/data/san/data0/databases/ICTV_database/20221013/ICTV_all_genomes.fna"
+        # Path to ICTV metadata
+        metadata: "/data/san/data0/databases/ICTV_database/20221013/ICTV_metadata.tsv"
+    # RefSeq Viral
+    refseq_viral:
+        # Path to RefSeq Viral database
+        path: "/data/san/data0/databases/refseq_viral/20230113_release_216/nucl/viral.1.1.genomic.fna"
+        # Path to RefSeq Viral metadata
+        metadata: "/data/san/data0/databases/refseq_viral/20230113_release_216/refseq_216_metadata.lineage.tsv"
+    # Andrey Crassphage DB
+    crassphage:
+        # Path to the databse
+        path: "/data/san/data0/users/remi/databases/andrey_final_db_stephen_crass/all_contigs.fa"
+    # IMG/VR database
+    IMG_VR:
+        # Path to the database
+        path: "/data/san/data0/databases/IMG_VR/IMG_VR_2022-12-19_7.1/IMGVR_all_nucleotides-high_confidence.fna"
+        # Path to the metadata file
+        metadata: "/data/san/data0/databases/IMG_VR/IMG_VR_2022-12-19_7.1/IMGVR_all_Sequence_information-high_confidence.tsv"
+    MGV:
+        # Path to the database
+        path: "/data/san/data0/databases/MGV/MGV_v1.0_2021_07_08/mgv_contigs.fna"
+    GPD:
+        # Path to the database
+        path: "/data/san/data0/databases/GPD/GPD_sequences.fa"
+    GVD:
+        # Path to the database
+        path: "/data/san/data0/databases/GVD/GVD"
