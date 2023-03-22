@@ -124,6 +124,6 @@ This pipeline consists of ??? steps called rules that take input files and creat
 #### Normal behavior
 
 <p align="center">
-  <img src="doc/dummy_dag.png?raw=true" height="400">
+  <img src="doc/dag.png?raw=true" height="400">
 </p>
 
