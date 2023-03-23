@@ -56,7 +56,7 @@ rule run_metaspades:
             "metaspades",
             "{sample}.log",
         ),
-    threads: 8
+    threads: 20
     resources:
         mem_mem=250000,
         time=60 * 24,
@@ -111,7 +111,7 @@ rule assemble_combined_sample:
             "{sample}.log",
         ),
     threads:
-        10
+        20
     shell:
         """
         megahit -1 {input.r1:q} -2 {input.r2:q} -t {threads} -o {output.dir:q} -f &> {log:q}

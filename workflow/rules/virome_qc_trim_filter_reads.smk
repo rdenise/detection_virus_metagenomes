@@ -70,8 +70,6 @@ rule multiqc:
             "qc",
             "multiqc_report.untrimmed.html",
         )
-    params:
-        use_input_files_only=True,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -270,8 +268,6 @@ rule multiqc_trimmed:
             "qc",
             "multiqc_report.trimmed.html",
         )
-    params:
-        use_input_files_only=True,
     log:
         os.path.join(
             OUTPUT_FOLDER,
