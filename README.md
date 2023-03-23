@@ -1,7 +1,6 @@
 # Snakemake workflow: Virome pipeline
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.24.2-brightgreen.svg)](https://snakemake.github.io)
-[![GitHub actions status](https://github.com/rdenise/detection_virus_metagenomes/workflows/Tests/badge.svg?branch=main)](https://github.com/rdenise/detection_virus_metagenomes/actions?query=branch%3Amain+workflow%3ATests)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 ## Aim
