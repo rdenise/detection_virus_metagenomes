@@ -3,6 +3,8 @@
 import Bio.SeqIO, time, gzip
 from operator import itemgetter
 import numpy as np, argparse
+import sys
+
 
 
 def parse_blast(handle):
@@ -20,6 +22,7 @@ def parse_blast(handle):
             "evalue": float(r[-4]),
         }
 
+###########################################################
 
 def yield_alignment_blocks(handle):
     # init block with 1st record
@@ -40,6 +43,7 @@ def yield_alignment_blocks(handle):
             alns = [aln]
     yield alns
 
+###########################################################
 
 def prune_alns(alns, min_length=0, min_evalue=1e-3):
     # remove alignments with < min_length or > min_evalue
@@ -58,12 +62,14 @@ def prune_alns(alns, min_length=0, min_evalue=1e-3):
         cur_aln += aln_len
     return keep
 
+###########################################################
 
 def compute_ani(alns):
     return round(
         sum(a["len"] * a["pid"] for a in alns) / sum(a["len"] for a in alns), 2
     )
 
+###########################################################
 
 def compute_cov(alns):
 
@@ -101,6 +107,7 @@ def compute_cov(alns):
 
     return qcov, tcov
 
+###########################################################
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -129,6 +136,7 @@ def parse_arguments():
     )
     return vars(parser.parse_args())
 
+###########################################################
 
 if __name__ == "__main__":
     args = parse_arguments()

@@ -77,9 +77,9 @@ def get_final_output(outdir, reads=False):
             outdir,
             "processed_files",
             "genomad",
-            "viral_contigs",
-            "all_contigs.over3kb.nr_annotate",
-            "all_contigs.over3kb.nr_taxonomy.tsv",
+            "viral_contigs_annotation",
+            "viral_contigs_over_3kb_annotate",
+            "viral_contigs_over_3kb_taxonomy.tsv",
         ),
     )
 

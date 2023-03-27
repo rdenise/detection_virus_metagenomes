@@ -39,7 +39,7 @@ rule run_genomad:
     params:
         db=config["genomad"]["path"],
         composition=config["genomad"]["composition"],
-        virus_summary=os.path.join(
+        genomad_dir=os.path.join(
             OUTPUT_FOLDER,
             "processed_files",
             "genomad",
@@ -211,13 +211,13 @@ rule run_genomad_annotate:
             OUTPUT_FOLDER,
             "processed_files",
             "genomad",
-            "viral_contigs",
-            "all_contigs.over3kb.nr_annotate",
-            "all_contigs.over3kb.nr_taxonomy.tsv",
+            "viral_contigs_annotation",
+            "viral_contigs_over_3kb_annotate",
+            "viral_contigs_over_3kb_taxonomy.tsv",
         ),
     params:
         db=config["genomad"]["path"],
-        virus_summary=os.path.join(
+        genomad_dir=os.path.join(
             OUTPUT_FOLDER,
             "processed_files",
             "genomad",
@@ -261,7 +261,7 @@ rule convert_blast_to_ani:
             "viral_contigs_over_3kb_all_VS_all.ani",
         ),
     params:
-        anicalc="../scripts/anicalc.py",
+        anicalc=workflow.source_path("../scripts/anicalc.py"),
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -303,7 +303,7 @@ rule cluster_viruses_into_vOTUs:
             "viral_contigs_over_3kb_otu.tsv",
         ),
     params:
-        aniclust="../scripts/aniclust.py",
+        aniclust=workflow.source_path("../scripts/aniclust.py"),
     log:
         os.path.join(
             OUTPUT_FOLDER,

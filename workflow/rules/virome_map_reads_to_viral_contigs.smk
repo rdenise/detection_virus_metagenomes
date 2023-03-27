@@ -4,7 +4,7 @@
 
 rule build_index:
     input:
-        fasta=os.path.join(
+        ref=os.path.join(
             OUTPUT_FOLDER,
             "results",
             "viral_contigs",
@@ -47,7 +47,7 @@ rule build_index:
 
 rule map_reads:
     input:
-        index=multiext(
+        idx=multiext(
             os.path.join(
                 OUTPUT_FOLDER,
                 "processed_files",
@@ -79,14 +79,12 @@ rule map_reads:
             ),
         ]
     output:
-        temp(
-            os.path.join(
-                OUTPUT_FOLDER,
-                "processed_files",
-                "bowtie2",
-                "{sample}",                
-                "{sample}.sam",
-            )
+        os.path.join(
+            OUTPUT_FOLDER,
+            "processed_files",
+            "samtools",
+            "{sample}",                
+            "{sample}.bam",
         )
     params:
         extra="",  # optional parameters      
@@ -99,49 +97,7 @@ rule map_reads:
         ),
     threads: 10  # Use at least two threads
     wrapper:
-        "v1.24.0/bio/bowtie2/align"
-
-
-##########################################################################
-##########################################################################
-
-rule samtools_view:
-    input:
-        os.path.join(
-            OUTPUT_FOLDER,
-            "processed_files",
-            "bowtie2",
-            "{sample}",                
-            "{sample}.sam",
-        )
-    output:
-        bam=os.path.join(
-            OUTPUT_FOLDER,
-            "processed_files",
-            "samtools",
-            "{sample}",
-            "{sample}.bam",
-        ),
-        idx=os.path.join(
-            OUTPUT_FOLDER,
-            "processed_files",
-            "samtools",
-            "{sample}",
-            "{sample}.bai",
-        ),
-    log:
-        os.path.join(
-            OUTPUT_FOLDER,
-            "logs",
-            "samtools",
-            "{sample}.samtools.view.log",
-        ),
-    params:
-        extra="",  # optional params string
-        region="",  # optional region string
-    threads: 10
-    wrapper:
-        "v1.24.0/bio/samtools/view"
+        "v1.24.0/bio/bowtie2/align" # It does bowtie and samtool view
 
 
 ##########################################################################

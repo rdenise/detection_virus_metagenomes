@@ -6,3 +6,4 @@ channels:
 dependencies:
   - bacphlip = 0.9.6
   - hmmer = 3.3.2
+  - numpy = 1.20.0

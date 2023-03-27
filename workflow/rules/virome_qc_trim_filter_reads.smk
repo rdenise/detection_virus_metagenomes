@@ -60,7 +60,7 @@ rule multiqc:
                 "reads_trimmed",
                 "report",
                 "json",
-                "{sample}.json",
+                "{sample}.fastp.json",
             ), 
             sample=FASTQ_SAMPLE,
         )
@@ -149,7 +149,7 @@ rule fastp_pe:
                 "reads_trimmed",
                 "report",
                 "html",
-                "{sample}.html",
+                "{sample}.fastp.html",
             ),
         json=os.path.join(
                 OUTPUT_FOLDER,
@@ -157,7 +157,7 @@ rule fastp_pe:
                 "reads_trimmed",
                 "report",
                 "json",
-                "{sample}.json",
+                "{sample}.fastp.json",
             ),
     log:
         os.path.join(
@@ -238,7 +238,7 @@ rule multiqc_trimmed:
                 "reads_trimmed",
                 "report",
                 "json",
-                "{sample}.json",
+                "{sample}.fastp.json",
             ), 
             sample=FASTQ_SAMPLE,
         ),

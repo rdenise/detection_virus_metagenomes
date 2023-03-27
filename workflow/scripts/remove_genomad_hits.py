@@ -10,7 +10,7 @@ sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 ###########################################################
 
 # Dataframe that contains all the informations about
-genomad_contigs = pd.read_table(snakemake.input.virus_summary).seqname.unique().tolist()
+genomad_contigs = pd.read_table(snakemake.input.virus_summary).seq_name.unique().tolist()
 
 all_contigs = genomad_contigs
 

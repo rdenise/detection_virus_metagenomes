@@ -72,6 +72,8 @@ rule parse_bacphlip:
             "bacphlip_out",
             "viral_contigs_over_3kb.fna.bacphlip.tsv",
         ),
+    params:
+        cutoff=0.95,
     log:
         os.path.join(
             OUTPUT_FOLDER,

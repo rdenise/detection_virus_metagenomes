@@ -176,7 +176,7 @@ def process_refseq_hits(refseq_blast_hits, refseq_taxonomy):
     refseq_taxonomy_df = pd.read_table(refseq_taxonomy)
 
     # Merge the 2 tables
-    refseq_blast_hits = ICTV_blast_hits.merge(
+    refseq_blast_hits = refseq_blast_hits.merge(
         refseq_taxonomy_df, left_on="tname", right_on="Representative", how="left"
     )
 

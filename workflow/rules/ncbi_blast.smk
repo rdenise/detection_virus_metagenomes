@@ -24,11 +24,12 @@ rule blastn:
     params:
         database=lambda wildcards: DB_DICT[wildcards.database]["path"],
         tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "virus", "tmp"
+            OUTPUT_FOLDER, "processed_files", "blast", "virus", "tmp_{database}"
         ),
         outfmt="6 qseqid sseqid pident length qlen slen evalue qstart qend sstart send stitle",
         evalue="{evalue}",
         options_blast="-num_alignments 25000",
+        max_len=2000000,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -36,9 +37,7 @@ rule blastn:
             "blast",
             "virus",
             "all_contigs.nr.evalue_{evalue}.{database}.blastn.outfmt6.log",
-        ),   
-    resources:
-        cpus=5,
+        ),
     conda:
         "../envs/blast.yaml"
     threads: 10
@@ -121,6 +120,7 @@ rule blastn_human:
                     "-word_size 28 -best_hit_overhang 0.1 -best_hit_score_edge 0.1 -dust yes -taxids 9606 "
                     "-min_raw_gapped_score 100 -perc_identity 90 -soft_masking true -max_target_seqs 10 "
         ),
+        max_len=2000000,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -129,8 +129,6 @@ rule blastn_human:
             "human",
             "all_contigs.nt.human.blastn.outfmt6.log",
         ),
-    resources:
-        cpus=5,
     conda:
         "../envs/blast.yaml"
     threads: 20
@@ -163,7 +161,7 @@ rule merge_blastn_human:
             "contigs",
             "human_filtered",
             "all_contigs.over3kb.nr.filtered.fasta",
-        ),      
+        ),   
     params:
         tsv=os.path.join(
             OUTPUT_FOLDER,
@@ -223,6 +221,7 @@ rule blast_all_vs_all:
         outfmt="6 qseqid sseqid pident length qlen slen evalue qstart qend sstart send stitle",
         evalue="1e-20",
         options_blast="",
+        max_len=2000000,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -251,7 +250,7 @@ rule keep_only_nr_contigs:
             "assemblies",
             "all_contigs.over3kb.fasta",
         ), 
-        blast_out=os.path.join(
+        blast_file=os.path.join(
             OUTPUT_FOLDER,
             "processed_files",
             "blast",
@@ -276,6 +275,7 @@ rule keep_only_nr_contigs:
         evalue = 1e-20,
         coverage = 0.85,
         pident = 0.95,
+        minimum_length=config["default_blast_option"]["length_min"],
     conda:
         "../envs/biopython.yaml"
     log:
@@ -284,7 +284,7 @@ rule keep_only_nr_contigs:
             "logs",
             "blast",
             "dereplicated",
-            "blast._dereplicationlog",
+            "blast_dereplication.log",
         ),
     threads:
         1
@@ -323,6 +323,7 @@ rule blast_otu:
         outfmt="6 qseqid sseqid pident length mismatch gapopen qstart qend  sstart send evalue bitscore qlen slen",
         evalue="1e-5",
         options_blast="-task megablast -max_target_seqs 20000",
+        max_len=2000000,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -367,6 +368,7 @@ rule blastn_taxonomy:
         outfmt="6 qseqid sseqid pident length mismatch gapopen qstart qend qlen sstart send slen evalue bitscore staxids stitle",
         evalue="1e-10",
         options_blast="-num_alignments 25000",
+        max_len=2000000,
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -374,9 +376,7 @@ rule blastn_taxonomy:
             "blast",
             "taxonomy",
             "viral_contigs_over_3kb.evalue_1e-10.{database}.blastn.outfmt6.log",
-        ),   
-    resources:
-        cpus=5,
+        ),
     conda:
         "../envs/blast.yaml"
     threads: 10
@@ -428,7 +428,15 @@ rule extract_species_from_blasts:
         ictv_db=DB_DICT["ICTV"]["metadata"],
         refseq_db=DB_DICT["refseq_viral"]["metadata"],
         img_db=DB_DICT["IMG_VR"]["metadata"],
-        anicalc="../scripts/anicalc.py",
+        anicalc=workflow.source_path("../scripts/anicalc.py"),
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "blast",
+            "taxonomy",
+            "update_taxonomies.log",
+        ),
     conda:
         "../envs/biopython.yaml"
     script:
