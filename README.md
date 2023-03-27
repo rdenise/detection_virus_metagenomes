@@ -96,15 +96,29 @@ This workflow consists of steps called rules that take input files and create ou
 2. A folder containing your work will be created:
 
 ```
-   [project_name]/                           <- top-level project folder (your project_name)
-   │
-   │
-   ├── report.html                           <- This report file      
-   │
-   ├── logs                                  <- Collection of log outputs, e.g. from cluster managers
-   │
-   ├── ????
-
+[output_name]                          <- Main results folder
+├── databases                          <- Folder containing databases used in the analysis
+│   ├── checkv_db                      <- CheckV database for viral genome completeness and contamination assessment
+│   ├── contigs                        <- Folder containing contig FASTA files
+│   └── reads_trimmed                  <- Folder containing trimmed read FASTQ files
+├── logs                               <- Folder containing log files for each analysis step
+├── processed_files                    <- Folder containing processed files resulting from the analysis
+│   ├── assemblies                     <- Folder containing assembled contigs
+│   ├── blast                          <- Folder containing BLAST output files
+│   ├── bowtie2                        <- Folder containing Bowtie2 output files
+│   ├── checkv                         <- Folder containing CheckV output files
+│   ├── genomad                        <- Folder containing downloaded GenomAD data
+│   ├── otu                            <- Folder containing OTU clustering output files
+│   └── samtools                       <- Folder containing Samtools output files
+├── qc                                 <- Folder containing quality control reports
+│   ├── fastqc                         <- FastQC report files for each input read file
+│   ├── multiqc_report.trimmed_data    <- MultiQC report for trimmed reads
+│   └── multiqc_report.untrimmed_data  <- MultiQC report for untrimmed reads
+└── results                            <- Folder containing final analysis results
+    ├── bacphlip_out                   <- Output files for BacPhlip viral protein prediction tool
+    ├── iphop                          <- Output files for IPHOP prophage prediction tool
+    ├── taxonomy                       <- Folder containing taxonomy assignment output files
+    └── viral_contigs                  <- Folder containing viral contigs identified in the analysis
 ```
 
 3. When restarting the pipeline, the software will check if you made any changes in the seed file before running. If changes have been made, it will run what is necessary, else nothing will happen.
