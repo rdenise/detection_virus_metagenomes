@@ -363,7 +363,12 @@ rule get_representative_vOTU_contigs:
             "viral_contigs",
             "viral_contigs_over_3kb.fna",
         ),
-        vOTU_list="data/processed/virome/viral_contig_identification/final_vOTUs_representative_contigs.txt",
+        vOTU_list=os.path.join(
+            OUTPUT_FOLDER,
+            "processed_files",
+            "otu",
+            "final_vOTUs_representative_contigs.txt",
+        ),
     output:
         os.path.join(
             OUTPUT_FOLDER,

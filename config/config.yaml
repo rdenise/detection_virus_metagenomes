@@ -1,7 +1,7 @@
 # Path to the metagenomes files
 metagenomes:
     # path to contigs reads folder
-    reads_folder: "/data/san/data1/users/remi/pipeline_identify_virus/test/"
+    reads_folder: "/data/san/data0/raw_data/remi/GW_Longit_Tanya/"
     # identifier of the sample name in the reads files (e.g. _R if the file is named sample1_R1.fastq.gz)
     reads_identifier: "_R"
     # path to contigs folder if you already done the assembly
@@ -10,7 +10,7 @@ metagenomes:
     contigs_ext: ""
 
 # path to the result folder
-output_folder: results
+output_folder: "/data/san/data1/users/remi/Tanya_GW_Longit"
 
 # Blast option if not given in seeds.tsv
 default_blast_option:
