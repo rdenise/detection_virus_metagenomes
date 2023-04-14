@@ -23,6 +23,14 @@ rule predict_viral_lifestyles:
             "bacphlip_out",
             "viral_contigs_over_3kb.fna.hmmsearch.tsv",
         ),
+        bacphlipdir=directory(
+            os.path.join(
+                OUTPUT_FOLDER,
+                "results",
+                "bacphlip_out",
+                "viral_contigs_over_3kb.fna.BACPHLIP_DIR",
+            )
+        ),
     params:
         bacphlip=os.path.join(
             OUTPUT_FOLDER,
@@ -35,6 +43,12 @@ rule predict_viral_lifestyles:
             "results",
             "viral_contigs",
             "viral_contigs_over_3kb.fna.hmmsearch.tsv",
+        ),
+        bacphlipdir=os.path.join(
+            OUTPUT_FOLDER,
+            "results",
+            "viral_contigs",
+            "viral_contigs_over_3kb.fna.BACPHLIP_DIR",
         ),
     log:
         os.path.join(
@@ -49,6 +63,7 @@ rule predict_viral_lifestyles:
         """
         bacphlip -i {input.fasta:q} --multi_fasta -f &> {log:q}
         mv {params.bacphlip:q} {output.bacphlip:q}
+        mv {params.bacphlipdir:q} {output.bacphlipdir:q}
         mv {params.hmmsearch:q} {output.hmmsearch:q}
         """
 

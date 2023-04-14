@@ -56,18 +56,24 @@ rule run_metaspades:
             "metaspades",
             "{sample}.log",
         ),
+    conda:
+        "../envs/spades.yaml"
     threads: 20
     resources:
-        mem_mem=250000,
+        mem_mem=250, # in GB
         time=60 * 24,
-    wrapper:
-        "v1.24.0/bio/spades/metaspades"
+        cpus=20,
+    shell:
+        """
+        spades.py --meta --threads {threads} -o {output.dir} -k {params.k} \
+        --pe1-1 {input[0]} --pe1-2 {input[1]} --memory {resources.mem_mem} &> {log}
+        """
 
 ##########################################################################
 ##########################################################################
 
 
-rule assemble_combined_sample:
+rule run_megahit:
     input:
         r1=os.path.join(
             OUTPUT_FOLDER,
@@ -107,7 +113,7 @@ rule assemble_combined_sample:
         os.path.join(
             OUTPUT_FOLDER,
             "logs",
-            "metaspades",
+            "megahit",
             "{sample}.log",
         ),
     threads:

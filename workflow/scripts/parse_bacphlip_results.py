@@ -23,13 +23,11 @@ def parse_arguments():
         "--input_file",
         help="the path to the input file",
         default=snakemake.input.bacphlip,
-        required=True,
     )
     parser.add_argument(
         "--output_file",
         help="the path to the output file",
         default=snakemake.output.modify,
-        required=True,
     )
 
     # parse the arguments
