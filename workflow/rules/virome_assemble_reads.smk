@@ -139,12 +139,12 @@ rule append_sample_names_to_subject_individual_assemblies:
     output:
         contigs=temp(
             os.path.join(
-                    OUTPUT_FOLDER,
-                    "processed_files",
-                    "assemblies",
-                    "{sample}",
-                    "{software}",
-                    "renamed.{file}",
+                OUTPUT_FOLDER,
+                "processed_files",
+                "assemblies",
+                "{sample}",
+                "{software}",
+                "renamed.{file}",
             )
         ),
     params: 

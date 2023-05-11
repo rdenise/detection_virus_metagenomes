@@ -39,8 +39,7 @@ def parse_arguments():
 ###########################################################
 
 
-def main():
-    args = parse_arguments()
+def main(args):
 
     # import bacphlip dataframe
     df = pd.read_csv(args.input_file, sep="\t")
@@ -68,4 +67,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)

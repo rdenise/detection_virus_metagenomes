@@ -286,6 +286,9 @@ FASTQ_SEP = config["metagenomes"]["reads_identifier"]
 # Only get one extension
 FASTQ_EXT = FASTQ_EXT[0] if "md5" not in FASTQ_EXT[0] else FASTQ_EXT[0][:-4]
 
+# Get the fastq files
+FASTQ_SAMPLE = list(set(FASTQ_SAMPLE))
+
 # print(get_final_output(
 #             outdir=OUTPUT_FOLDER,
 #             reads=reads

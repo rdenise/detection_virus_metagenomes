@@ -2,11 +2,13 @@ from Bio import SeqIO
 import argparse
 import os
 import subprocess
-import io
-import multiprocessing as mp
+import io, sys
+# import multiprocessing as mp
 import shutil
-import pandas as pd
+# import pandas as pd
 from pathlib import Path
+import time
+from concurrent.futures import ProcessPoolExecutor
 
 # Put error and out into the log file
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
@@ -68,7 +70,7 @@ def parse_args():
         "--contigs_per_file",
         help="The number of contigs in each slice",
         type=int,
-        default=100,
+        default=1050,
     )
     parser.add_argument("--job_number", type=int, default=snakemake.threads)
     parser.add_argument(
@@ -86,7 +88,7 @@ def parse_args():
 def main(args):
 
     # split the input file
-    record_iter = SeqIO.parse(open(args.in_fasta_file), "fasta")
+    record_iter = open(args.in_fasta_file)
     files_to_run = []
 
     for i, batch in enumerate(batch_iterator(record_iter, args.contigs_per_file, args.max_length)):
@@ -98,8 +100,9 @@ def main(args):
             create_folder(f"{args.tmp_dir}/{group_name}")
 
             with open(filename, "w") as handle:
-                count = SeqIO.write(batch, handle, "fasta")
-                print(f"Wrote {count} records to {filename}")
+                # count = SeqIO.write(batch, handle, "fasta")
+                handle.write(batch[0])
+                print(f"Wrote {batch[1]} records to {filename}")
                 files_to_run.append((group_name, dir_name, filename))
         except IOError as ioerror:
             print(ioerror)
@@ -115,12 +118,24 @@ def main(args):
                 f"----makeblastdb - stdout----\n{stdout}\n----makeblastdb - stderr----\n{stderr}\n"
             )
 
-    pool = mp.Pool(args.job_number)
-    results = pool.map(run_job, files_to_run)
-    pool.close()
+    record_iter.close()
 
-    df = pd.concat(results)
-    df.to_csv(args.outfile, sep="\t", index=False, header=False)
+    # pool = mp.Pool(args.job_number)
+    # results = pool.map(run_job, files_to_run)
+    # pool.close()
+
+    with ProcessPoolExecutor(max_workers=args.job_number) as executor:
+        results = list(executor.map(run_job, files_to_run))
+
+    # results = Parallel(n_jobs=args.job_number)(delayed(run_job)(file) for file in files_to_run)
+
+    # df = pd.concat(results)
+    # df.to_csv(args.outfile, sep="\t", index=False, header=False)
+
+    with open(args.outfile, "wb") as outfile:
+        for result in results:
+            with open(os.path.join(result), 'rb') as readfile:
+                shutil.copyfileobj(readfile, outfile)
 
     print(f"{bcolors.OKBLUE} ------ DONE! ----------- {bcolors.ENDC}")
     shutil.rmtree(args.tmp_dir)
@@ -137,6 +152,8 @@ def run_job(group_tuple):
         blast_remote = "-task blastn -remote"
         blast_database = "nt"
 
+    # -out {group_tuple[1]}/blast-output.txt 
+
     job_str = (
         f"blastn -query {group_tuple[2]} -out {group_tuple[1]}/blast-output.txt "
         f"-db '{blast_database}' -evalue {args.evalue} {blast_remote} "
@@ -150,15 +167,19 @@ def run_job(group_tuple):
         stderr = ""
     else:
         stdout, stderr = execute(job_str)
-    print(f"----BLASTn - stdout----\n{stdout}\n----BLASTn - stderr----\n{stderr}\n")
+    # stdout, stderr = execute(job_str)
 
-    if os.path.isfile(file_name) and os.path.getsize(
-        file_name
-    ):
-        df = pd.read_csv(file_name, sep="\t", header=None)
-    else:
-        df = pd.DataFrame()
-    return df
+    print(f"----BLASTn - stderr----\n{stderr}\n")
+    # print(f"----BLASTn - stdout----\n{stdout}\n----BLASTn - stderr----\n{stderr}\n")
+
+    # if os.path.isfile(file_name) and os.path.getsize(
+    #     file_name
+    # ):
+    #     df = pd.read_csv(file_name, sep="\t", header=None)
+    # else:
+    #     df = pd.DataFrame()
+
+    return file_name
 
 
 ###########################################################
@@ -195,7 +216,8 @@ def batch_iterator(iterator, batch_size, max_len):
     entry = True  # Make sure we loop once
     while entry:
         batch = []
-        while len(batch) < batch_size:
+        index = 0
+        while index < batch_size:
             try:
                 entry = next(iterator)
             except StopIteration:
@@ -203,10 +225,14 @@ def batch_iterator(iterator, batch_size, max_len):
             if entry is None:
                 # End of file
                 break
-            if max_len and len(entry.seq) <= max_len:
-                batch.append(entry)
+            # if max_len and len(entry.seq) <= max_len:
+            elif entry.startswith(">"):
+                index += 1
+            
+            batch.append(entry)
         if batch:
-            yield batch
+            yield "".join(batch[:-1]), index
+            batch = [entry]
 
 
 ###########################################################

@@ -192,6 +192,48 @@ rule merge_blastn_human:
 ##########################################################################
 ##########################################################################
 
+rule blast_makedatabase_nucleotide_dereplication:
+    input:
+        fasta=os.path.join(
+            OUTPUT_FOLDER,
+            "processed_files",
+            "assemblies",
+            "all_contigs.over3kb.fasta",
+        )
+    output:
+        multiext(
+            os.path.join(
+                OUTPUT_FOLDER,
+                "processed_files",
+                "assemblies",
+                "all_contigs.over3kb.fasta",
+            ),
+            ".ndb",
+            ".not",
+            ".ntf",
+            ".nto",
+            ".njs"
+        )
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "blast",
+            "dereplicated",
+            "blast.makeblastdb.log",
+        ),
+    params:
+        "-input_type fasta -blastdb_version 5 -parse_seqids"
+    conda:
+        "../envs/blast.yaml"
+    shell:
+        """
+        makeblastdb -in {input.fasta:q} -dbtype nucl {params} -logfile {log:q} -out {input.fasta:q}
+        """
+
+##########################################################################
+##########################################################################
+
 rule blast_all_vs_all:
     input:
         contig=os.path.join(
@@ -199,7 +241,20 @@ rule blast_all_vs_all:
             "processed_files",
             "assemblies",
             "all_contigs.over3kb.fasta",
-        )
+        ),
+        blastdb=multiext(
+            os.path.join(
+                OUTPUT_FOLDER,
+                "processed_files",
+                "assemblies",
+                "all_contigs.over3kb.fasta",
+            ),
+            ".ndb",
+            ".not",
+            ".ntf",
+            ".nto",
+            ".njs"
+        ),
     output:
         blast_out=os.path.join(
             OUTPUT_FOLDER,
@@ -215,13 +270,8 @@ rule blast_all_vs_all:
             "assemblies",
             "all_contigs.over3kb.fasta",
         ),
-        tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "dereplicated", "tmp"
-        ),
         outfmt="6 qseqid sseqid pident length qlen slen evalue qstart qend sstart send stitle",
-        evalue="1e-20",
-        options_blast="",
-        max_len=2000000,
+        evalue="1e-10",
     log:
         os.path.join(
             OUTPUT_FOLDER,
@@ -234,8 +284,10 @@ rule blast_all_vs_all:
         "../envs/blast.yaml"
     threads:
         20
-    script:
-        "../scripts/blastn_wrapper.py"
+    shell:
+        """
+        blastn -query {input.contig:q} -db {params.database:q} -out {output.blast_out:q} -outfmt {params.outfmt:q} -evalue {params.evalue} -num_threads {threads} > {log:q}
+        """
 
 
 ##########################################################################

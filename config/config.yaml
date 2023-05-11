@@ -71,4 +71,4 @@ databases:
         path: "/data/san/data0/databases/GPD/GPD_sequences.fa"
     GVD:
         # Path to the database
-        path: "/data/san/data0/databases/GVD/GVD"
+        path: "/data/san/data0/databases/GVD/GVDv1_viralpopulations.fna"
