@@ -345,9 +345,8 @@ all_hits = pd.concat(
 )
 
 # identify duplicate qnames and store them in a list
-duplicates = list(
-    set(all_hits[all_hits.duplicated(["qname"], keep=False)]["qname"].tolist())
-)
+duplicates = all_hits[all_hits.duplicated(["qname"], keep=False)]["qname"].unique().tolist()
+
 
 # cycle through the list of duplicates and collect hits to dbs in the following order of preference ictv, refseq, img_vr, crass
 
@@ -374,19 +373,10 @@ for i in duplicates:
 best_taxa = pd.concat(best_taxa).reset_index(drop=True)
 
 # keep only the first of perfect duplicates
-best_taxa = best_taxa.drop_duplicates(keep="first").reset_index(drop=True)
+best_taxa = best_taxa.drop_duplicates(["qname", "db"], keep="first").reset_index(drop=True)
 
 # flag if there are still any remaining duplicates
-if (
-    len(
-        list(
-            set(
-                best_taxa[best_taxa.duplicated(["qname"], keep=False)]["qname"].tolist()
-            )
-        )
-    )
-    > 0
-):
+if len(best_taxa[best_taxa.duplicated(["qname"], keep=False)]["qname"].unique().tolist()) > 0:
     print(
         "There are still duplicates in the best_taxa table fix script as likely conflicting taxonomy was found for the same contig"
     )
@@ -394,7 +384,7 @@ if (
 
 # concat best_taxa with the unique values in the all_hits table
 all_hits = all_hits[~all_hits["qname"].isin(duplicates)].reset_index(drop=True)
-all_hits = pd.concat([all_hits, best_taxa]).reset_index(drop=True)
+all_hits = pd.concat([all_hits, best_taxa], ignore_index=True)
 
 # write all_hits to file
 all_hits.to_csv(args.outfile, sep="\t", index=False)

@@ -42,7 +42,7 @@ rule iphop_run:
         ),
         iphop_db=os.path.join(
             config["iphop_db"],
-            "Sept_2021_pub",
+            "Sept_2021_pub_rw",
         ),
     output:
         results=directory(
