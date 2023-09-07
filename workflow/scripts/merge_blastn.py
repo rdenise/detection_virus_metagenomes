@@ -244,8 +244,8 @@ def checkHSPS(hsp1, hsp2, HSPMIN=100):
     """compare two HSPS in the blast output
 
     Args:
-        hsp1 (np.array): Blast values of the given hsp (best)
-        hsp2 (np.array): Blast values of the given hsp (questioning)
+        hsp1 (np.ndarray): Blast values of the given hsp (best)
+        hsp2 (np.ndarray): Blast values of the given hsp (questioning)
         HSPMIN (int, optional): Minumum length of the HSP. Defaults to 100.
 
     Returns:
@@ -259,22 +259,22 @@ def checkHSPS(hsp1, hsp2, HSPMIN=100):
         return dict_update
 
     # Check is hsp2 inside hsp1 for the query sequence: 'qstart': 6, 'qend': 7,
-    if hsp1[7] >= hsp2[7] and hsp1[8] <= hsp2[8]:
+    if hsp1[6] >= hsp2[6] and hsp1[7] <= hsp2[7]:
         # print(f'hsp2 inside hsp1 for query: {hsp1[6]} >= {hsp2[6]} and {hsp1[7]} <= {hsp2[7]}')
         return dict_update
 
     # Check is hsp1 inside hsp2 for the query sequence: 'qstart': 6, 'qend': 7,
-    elif hsp1[7] <= hsp2[7] and hsp1[8] >= hsp2[8]:
+    elif hsp1[6] <= hsp2[6] and hsp1[7] >= hsp2[7]:
         # print(f'hsp1 inside hsp2 for query: {hsp1[6]} <= {hsp2[6]} and {hsp1[7]} >= {hsp2[7]}')
         return dict_update
 
     # Check is hsp1 inside hsp2 for the subject sequence: 'sstart': 8, 'send': 9,
-    elif hsp1[9] >= hsp2[9] and hsp1[10] <= hsp2[10]:
+    elif hsp1[8] >= hsp2[8] and hsp1[9] <= hsp2[9]:
         # print(f'hsp2 inside hsp1 for subject: {hsp1[8]} >= {hsp2[8]} and {hsp1[9]} <= {hsp2[9]}')
         return dict_update
 
     # Check is hsp2 inside hsp1 for the subject sequence: 'sstart': 8, 'send': 9,
-    elif hsp1[9] <= hsp2[9] and hsp1[10] >= hsp2[10]:
+    elif hsp1[8] <= hsp2[8] and hsp1[9] >= hsp2[9]:
         # print(f'hsp1 inside hsp2 for subject: {hsp1[8]} <= {hsp2[8]} and {hsp1[9]} >= {hsp2[9]}')
         return dict_update
 
@@ -282,15 +282,15 @@ def checkHSPS(hsp1, hsp2, HSPMIN=100):
     # Query:    ---- A ---- B -----   A = HSP1
     # Sbjct:    ---- B ---- A -----   B = HSP2
 
-    if (hsp1[8] - hsp2[8]) * (hsp1[10] - hsp2[10]) < 0:
+    if np.int64(hsp1[7] - hsp2[7]) * np.int64(hsp1[9] - hsp2[9]) < 0:
         # print(f'HSPs are in different orientation 1: ({hsp1[7]} - {hsp2[7]}) * ({hsp1[9]} - {hsp2[9]}) ===> {(hsp1[7] - hsp2[7]) * (hsp1[9] - hsp2[9])} < 0')
         return dict_update
-    elif (hsp1[7] - hsp2[7]) * (hsp1[9] - hsp2[9]) < 0:
+    elif np.int64(hsp1[6] - hsp2[6]) * np.int64(hsp1[8] - hsp2[8]) < 0:
         # print(f'HSPs are in different orientation 2: ({hsp1[6]} - {hsp2[6]}) * ({hsp1[8]} - {hsp2[8]}) ===> {(hsp1[6] - hsp2[6]) * (hsp1[8] - hsp2[8])} < 0')
         return dict_update
 
-    overlap_q = (hsp2[7] - hsp1[8]) * (hsp2[8] - hsp1[7])
-    overlap_s = (hsp2[9] - hsp1[10]) * (hsp2[10] - hsp1[9])
+    overlap_q = np.int64(hsp2[6] - hsp1[7]) * np.int64(hsp2[7] - hsp1[6])
+    overlap_s = np.int64(hsp2[8] - hsp1[9]) * np.int64(hsp2[9] - hsp1[8])
 
     # Accept non-overlapping HSPs in correct orientation
     if overlap_q > 0 and overlap_s > 0:
@@ -307,10 +307,10 @@ def checkHSPS(hsp1, hsp2, HSPMIN=100):
         for index_key in dict_update:
             hsp2[index_key] = dict_update[index_key]
 
-        overlap_s = (hsp2[9] - hsp1[10]) * (hsp2[10] - hsp1[9])
+        overlap_s = np.int64(hsp2[8] - hsp1[9]) * np.int64(hsp2[9] - hsp1[8])
 
     # Test if the subject is overlaping after possible update of an overlaping query
-    if overlap_s < 0 and hsp2[17] > 0:
+    if overlap_s < 0:
         # print(f'Overlap in subject: {overlap_s} > 0')
         dict_update = remove_overlap_subject(hsp1=hsp1, hsp2=hsp2)
 
