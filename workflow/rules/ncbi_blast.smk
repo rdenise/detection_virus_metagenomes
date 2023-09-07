@@ -23,9 +23,6 @@ rule blastn:
         ),
     params:
         database=lambda wildcards: DB_DICT[wildcards.database]["path"],
-        tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "virus", "tmp_{database}"
-        ),
         outfmt="6 qseqid sseqid pident length qlen slen evalue qstart qend sstart send stitle",
         evalue="{evalue}",
         options_blast="-num_alignments 25000",
@@ -36,13 +33,24 @@ rule blastn:
             "logs",
             "blast",
             "virus",
-            "all_contigs.nr.evalue_{evalue}.{database}.blastn.outfmt6.log",
+            "nr.evalue_{evalue}.{database}.blastn.outfmt6.log",
         ),
     conda:
         "../envs/blast.yaml"
-    threads: 10
-    script:
-        "../scripts/blastn_wrapper.py"
+    threads: 20
+    shell:
+        """
+        if [[ $(stat -c "%s" {input.contig:q}) -gt $(stat -c "%s" {params.database:q}) ]]
+        then
+            blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt 6 \
+                -num_threads {threads} -mt_mode 1 &> {log:q}
+        else
+            blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt 6 \
+                -num_threads {threads} -mt_mode 0 &> {log:q}
+        fi            
+        """
 
 
 ##########################################################################
@@ -111,15 +119,8 @@ rule blastn_human:
         ),
     params:
         database=blast_database,
-        tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "human", "tmp"
-        ),
         outfmt="6 qseqid sseqid pident length qlen slen evalue qstart qend sstart send stitle",
         evalue="0.0001",
-        options_blast=(
-                    "-word_size 28 -best_hit_overhang 0.1 -best_hit_score_edge 0.1 -dust yes -taxids 9606 "
-                    "-min_raw_gapped_score 100 -perc_identity 90 -soft_masking true -max_target_seqs 10 "
-        ),
         max_len=2000000,
     log:
         os.path.join(
@@ -127,13 +128,20 @@ rule blastn_human:
             "logs",
             "blast",
             "human",
-            "all_contigs.nt.human.blastn.outfmt6.log",
+            "nt.human.blastn.outfmt6.log",
         ),
     conda:
         "../envs/blast.yaml"
     threads: 20
-    script:
-        "../scripts/blastn_wrapper.py"
+    shell:
+        """
+        blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+               -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
+               -word_size 28 -best_hit_overhang 0.1 -best_hit_score_edge 0.1 -dust yes -taxids 9606 \
+               -min_raw_gapped_score 100 -perc_identity 90 -soft_masking true -max_target_seqs 10 \
+               -num_threads {threads} -mt_mode 1 &> {log:q}
+        """
+
 
 ##########################################################################
 ##########################################################################
@@ -363,18 +371,8 @@ rule blast_otu:
             "viral_contigs_over_3kb_all_VS_all.blastout",
         ) 
     params:
-        database=os.path.join(
-            OUTPUT_FOLDER,
-            "results",
-            "viral_contigs",
-            "viral_contigs_over_3kb.fna",
-        ),
-        tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "otu", "tmp"
-        ),
         outfmt="6 qseqid sseqid pident length mismatch gapopen qstart qend  sstart send evalue bitscore qlen slen",
         evalue="1e-5",
-        options_blast="-task megablast -max_target_seqs 20000",
         max_len=2000000,
     log:
         os.path.join(
@@ -382,14 +380,19 @@ rule blast_otu:
             "logs",
             "blast",
             "otu",
-            "blast.log",
+            "blastn.log",
         ),
     conda:
         "../envs/blast.yaml"
-    threads:
-        20
-    script:
-        "../scripts/blastn_wrapper.py"
+    threads: 20
+    shell:
+        """
+        makeblastdb -in {params.contig:q} -dbtype nucl &> {log:q}
+
+        blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+                -db {input.contig:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
+                -num_threads {threads} -max_target_seqs 20000 &> {log:q}
+        """
 
 
 ##########################################################################
@@ -415,7 +418,11 @@ rule blastn_taxonomy:
     params:
         database=lambda wildcards: DB_DICT[wildcards.database]["path"],
         tmp_output=os.path.join(
-            OUTPUT_FOLDER, "processed_files", "blast", "taxonomy", "tmp"
+            OUTPUT_FOLDER,
+            "processed_files",
+            "blast",
+            "taxonomy",
+            "tmp_{database}",
         ),
         outfmt="6 qseqid sseqid pident length mismatch gapopen qstart qend qlen sstart send slen evalue bitscore staxids stitle",
         evalue="1e-10",
@@ -431,9 +438,20 @@ rule blastn_taxonomy:
         ),
     conda:
         "../envs/blast.yaml"
-    threads: 10
-    script:
-        "../scripts/blastn_wrapper.py"
+    threads: 20
+    shell:
+        """
+        if [[ $(stat -c "%s" {input.contig:q}) -gt $(stat -c "%s" {params.database:q}) ]]
+        then
+            blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
+                -num_threads {threads} -mt_mode 1 &> {log:q}
+        else
+            blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
+                -num_threads {threads} -mt_mode 0 &> {log:q}
+        fi            
+        """
 
 
 ##########################################################################
