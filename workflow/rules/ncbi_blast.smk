@@ -43,11 +43,11 @@ rule blastn:
         if [[ $(stat -c "%s" {input.contig:q}) -gt $(stat -c "%s" {params.database:q}) ]]
         then
             blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
-                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
                 -num_threads {threads} -mt_mode 1 {params.options_blast} &> {log:q}
         else
             blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
-                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt} \
+                -db {params.database:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
                 -num_threads {threads} -mt_mode 0 {params.options_blast} &> {log:q}
         fi            
         """
