@@ -387,7 +387,7 @@ rule blast_otu:
     threads: 20
     shell:
         """
-        makeblastdb -in {params.contig:q} -dbtype nucl &> {log:q}
+        makeblastdb -in {input.contig:q} -dbtype nucl &> {log:q}
 
         blastn -task megablast -query {input.contig:q} -out {output.blast_out:q} \
                 -db {input.contig:q} -evalue {params.evalue} -outfmt {params.outfmt:q} \
